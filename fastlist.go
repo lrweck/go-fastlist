@@ -23,6 +23,9 @@ func (fl *FastList) Get(index int) interface{} {
 }
 
 func (fl *FastList) RemoveLast() interface{} {
+	if fl.size == 0 {
+		return nil
+	}
 	fl.size--
 	elem := fl.elementData[fl.size]
 	fl.elementData = fl.elementData[:fl.size]

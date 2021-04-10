@@ -127,3 +127,40 @@ func TestClear(t *testing.T) {
 	}
 
 }
+
+func BenchmarkAdd(b *testing.B) {
+	fl := NewFastList()
+
+	for i := 0; i < b.N; i++ {
+		fl.Add(i)
+	}
+}
+
+func BenchmarkRemoveElement(b *testing.B) {
+	fl := NewFastList()
+
+	for i := 0; i < 5000; i++ {
+		fl.Add(i)
+	}
+
+	for i := 0; i < b.N; i++ {
+		fl.RemoveElement(i)
+	}
+
+	for i := b.N; i >= 0; i-- {
+		fl.RemoveElement(i)
+	}
+}
+
+func BenchmarkRemoveLast(b *testing.B) {
+	fl := NewFastList()
+
+	for i := 0; i < 5000000; i++ {
+		fl.Add(i)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_ = fl.RemoveLast()
+	}
+
+}
