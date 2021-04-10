@@ -19,6 +19,9 @@ func (fl *FastList) Add(element interface{}) bool {
 }
 
 func (fl *FastList) Get(index int) interface{} {
+	if fl.size <= 0 || index > fl.size-1 {
+		return nil
+	}
 	return fl.elementData[index]
 }
 
@@ -36,6 +39,7 @@ func (fl *FastList) GetAll() []interface{} {
 	return fl.elementData
 }
 
+// Most efficient at removing from the back of the queue
 func (fl *FastList) RemoveElement(element interface{}) bool {
 	for index := fl.size - 1; index >= 0; index-- {
 		if element == fl.elementData[index] {
