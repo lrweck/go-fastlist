@@ -12,12 +12,14 @@ func NewFastList() FastList {
 	}
 }
 
+// Adds any element to the list
 func (fl *FastList) Add(element interface{}) bool {
 	fl.elementData = append(fl.elementData, element)
 	fl.size++
 	return true
 }
 
+// Returns the element at index i
 func (fl *FastList) Get(index int) interface{} {
 	if fl.size <= 0 || index > fl.size-1 {
 		return nil
@@ -25,6 +27,7 @@ func (fl *FastList) Get(index int) interface{} {
 	return fl.elementData[index]
 }
 
+// Returns the last element from the list and removes it
 func (fl *FastList) RemoveLast() interface{} {
 	if fl.size == 0 {
 		return nil
@@ -35,11 +38,13 @@ func (fl *FastList) RemoveLast() interface{} {
 	return elem
 }
 
+// Returns all the elements
 func (fl *FastList) GetAll() []interface{} {
 	return fl.elementData
 }
 
-// Most efficient at removing from the back of the queue
+// Removes the element at index i
+// Most efficient at removing from the end of the list
 func (fl *FastList) RemoveElement(element interface{}) bool {
 	for index := fl.size - 1; index >= 0; index-- {
 		if element == fl.elementData[index] {
@@ -56,12 +61,14 @@ func (fl *FastList) RemoveElement(element interface{}) bool {
 	return false
 }
 
+// Clears the list (removes all elements)
 func (fl *FastList) Clear() {
 
 	fl.elementData = fl.elementData[:0]
 	fl.size = 0
 }
 
+// Returns the size of the list
 func (fl *FastList) Size() int {
 	return fl.size
 }
