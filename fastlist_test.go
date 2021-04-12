@@ -27,6 +27,36 @@ func TestGetAll(t *testing.T) {
 
 }
 
+func TestSet(t *testing.T) {
+
+	fl := NewFastList(true)
+
+	fl.Add(1)
+	fl.Add("a")
+	fl.Add("x")
+	fl.Add(123456)
+
+	var expected []interface{}
+	expected = append(expected, 123456, "x", "a", 1)
+
+	for i, v := range expected {
+		tmp := fl.Get(i)
+
+		if x := fl.Set(i, v); x != tmp {
+			t.Errorf("Expected %v, but got %v\n", tmp, x)
+		}
+	}
+
+	x := fl.Set(8, "cba")
+
+	if x == nil {
+		if tmp := fl.Get(8); tmp != "cba" {
+			t.Errorf("Expected %s, but got %v\n", "cba", tmp)
+		}
+	}
+
+}
+
 func TestGet(t *testing.T) {
 
 	fl := NewFastList(true)
@@ -81,6 +111,78 @@ func TestRemoveLast(t *testing.T) {
 
 }
 
+func TestRemoveElement(t *testing.T) {
+
+	fl := NewFastList(true)
+
+	fl.Add(1)
+	fl.Add("a")
+	fl.Add("x")
+	fl.Add(123456)
+
+	var expected []interface{}
+	expected = append(expected, 1, "a", "x", 123456)
+
+	for _, v := range expected {
+		ok := fl.RemoveElement(v)
+		if !ok {
+			t.Errorf("Error removing element %v\n", v)
+		}
+	}
+
+	if fl.Size() != 0 {
+		t.Errorf("Expected size 0, but got %d", fl.Size())
+	}
+
+	hm := fl.RemoveElement("hm")
+
+	if hm {
+		t.Errorf("Should not have found this...")
+	}
+
+}
+
+func TestRemoveIndex(t *testing.T) {
+
+	fl := NewFastList(true)
+
+	fl.Add(1)
+	fl.Add("a")
+	fl.Add("x")
+	fl.Add(123456)
+
+	var expected []interface{}
+	expected = append(expected, 1, "a", "x", 123456)
+
+	// for i, v := range expected {
+	// 	if el := fl.RemoveIndex(i); el != v {
+	// 		t.Errorf("Expected %v, but got %v\n", v, el)
+	// 	}
+	// }
+	for times := len(expected) - 1; times >= 0; times-- {
+		if tmp := fl.RemoveIndex(times); tmp != expected[times] {
+			t.Errorf("Expected %v, but got %v\n", expected[times], tmp)
+		}
+	}
+
+	if fl.Size() != 0 {
+		t.Errorf("Expected size 0, but got %d", fl.Size())
+	}
+
+	hm := fl.RemoveIndex(18)
+
+	if hm != nil {
+		t.Errorf("Should not have found element at index 18...")
+	}
+
+	hm = fl.RemoveIndex(-1)
+
+	if hm != nil {
+		t.Errorf("Should not have element at index -1...")
+	}
+
+}
+
 func TestSize(t *testing.T) {
 
 	fl := NewFastList(true)
@@ -124,6 +226,7 @@ func TestClear(t *testing.T) {
 
 }
 
+// Benchmarks Add Method
 func BenchmarkAdd(b *testing.B) {
 	fl := NewFastList(true)
 
@@ -146,6 +249,7 @@ func BenchmarkRemoveElement(b *testing.B) {
 	for i := b.N; i >= 0; i-- {
 		fl.RemoveElement(i)
 	}
+
 }
 
 func BenchmarkRemoveLast(b *testing.B) {

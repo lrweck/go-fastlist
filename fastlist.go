@@ -20,7 +20,7 @@ func NewFastList(isSafe bool) FastList {
 	}
 }
 
-// Adds any element to the list
+// Adds any element to the list and returns true if added succesfuly
 func (fl *FastList) Add(element interface{}) bool {
 
 	if fl.safe {
@@ -33,7 +33,7 @@ func (fl *FastList) Add(element interface{}) bool {
 	return true
 }
 
-// Returns the element at index i
+// Returns the element at the specified index or nil if not found
 func (fl *FastList) Get(index int) interface{} {
 
 	if fl.size <= 0 || index > fl.size-1 || index < 0 {
@@ -48,7 +48,8 @@ func (fl *FastList) Get(index int) interface{} {
 	return fl.elementData[index]
 }
 
-// Returns the last element from the list and removes it
+// Returns the last element from the list and removes it.
+// Returns nil if the list is empty
 func (fl *FastList) RemoveLast() interface{} {
 
 	if fl.size == 0 {
@@ -78,6 +79,7 @@ func (fl *FastList) GetAll() []interface{} {
 
 // Removes the element at index i
 // Most efficient at removing from the end of the list
+// Returns true if successfully removed and false if not
 func (fl *FastList) RemoveElement(element interface{}) bool {
 	if fl.safe {
 		fl.Lock()
@@ -85,17 +87,21 @@ func (fl *FastList) RemoveElement(element interface{}) bool {
 	}
 	for index := fl.size - 1; index >= 0; index-- {
 		if element == fl.elementData[index] {
-			if index == fl.size-1 {
-				fl.elementData = fl.elementData[:index]
-			} else {
-				copy(fl.elementData[index:], fl.elementData[index+1:])
-				fl.elementData = fl.elementData[:fl.size-1]
-			}
-			fl.size--
+			remElement(fl, index)
 			return true
 		}
 	}
 	return false
+}
+
+func remElement(fl *FastList, index int) {
+	if index == fl.size-1 {
+		fl.elementData = fl.elementData[:index]
+	} else {
+		copy(fl.elementData[index:], fl.elementData[index+1:])
+		fl.elementData = fl.elementData[:fl.size-1]
+	}
+	fl.size--
 }
 
 // Clears the list (removes all elements)
@@ -117,6 +123,9 @@ func (fl *FastList) Size() int {
 	return fl.size
 }
 
+// Sets an element at the index specified and returns the element
+// that was located at the specified location.
+// Returns nil if the specified location was empty or did not exist
 func (fl *FastList) Set(index int, element interface{}) interface{} {
 
 	if fl.safe {
@@ -134,8 +143,10 @@ func (fl *FastList) Set(index int, element interface{}) interface{} {
 	return old
 }
 
-func (fl *FastList) removeIndex(index int) interface{} {
-	if fl.size == 0 {
+// Removes an element at the specified index and returns it.
+// Returns nil if element does not exist
+func (fl *FastList) RemoveIndex(index int) interface{} {
+	if fl.size <= 0 || index > fl.size-1 || index < 0 {
 		return nil
 	}
 
@@ -146,10 +157,7 @@ func (fl *FastList) removeIndex(index int) interface{} {
 
 	old := fl.elementData[index]
 
-	numMoved := fl.size - index - 1
-	if numMoved > 0 {
-		copy(fl.elementData[:index], fl.elementData[:index-1])
-	}
-	fl.size--
+	remElement(fl, index)
+
 	return old
 }
