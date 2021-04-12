@@ -1,19 +1,33 @@
 package fastlist
 
+import "sync"
+
 type FastList struct {
+	sync.RWMutex
 	elementData []interface{}
 	size        int
+	safe        bool
 }
 
-func NewFastList() FastList {
+// Creates a new fastlist. Pass true as a parameter to create a concurrency-safe
+// list, or false otherwise.
+// Returns a FastList
+func NewFastList(isSafe bool) FastList {
 	return FastList{
-		make([]interface{}, 0),
-		0,
+		elementData: make([]interface{}, 0),
+		size:        0,
+		safe:        isSafe,
 	}
 }
 
 // Adds any element to the list
 func (fl *FastList) Add(element interface{}) bool {
+
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
+
 	fl.elementData = append(fl.elementData, element)
 	fl.size++
 	return true
@@ -21,17 +35,32 @@ func (fl *FastList) Add(element interface{}) bool {
 
 // Returns the element at index i
 func (fl *FastList) Get(index int) interface{} {
-	if fl.size <= 0 || index > fl.size-1 {
+
+	if fl.size <= 0 || index > fl.size-1 || index < 0 {
 		return nil
 	}
+
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
+
 	return fl.elementData[index]
 }
 
 // Returns the last element from the list and removes it
 func (fl *FastList) RemoveLast() interface{} {
+
 	if fl.size == 0 {
 		return nil
 	}
+
+	// should it be before the size == 0 check?
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
+
 	fl.size--
 	elem := fl.elementData[fl.size]
 	fl.elementData = fl.elementData[:fl.size]
@@ -40,12 +69,20 @@ func (fl *FastList) RemoveLast() interface{} {
 
 // Returns all the elements
 func (fl *FastList) GetAll() []interface{} {
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
 	return fl.elementData
 }
 
 // Removes the element at index i
 // Most efficient at removing from the end of the list
 func (fl *FastList) RemoveElement(element interface{}) bool {
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
 	for index := fl.size - 1; index >= 0; index-- {
 		if element == fl.elementData[index] {
 			if index == fl.size-1 {
@@ -63,17 +100,29 @@ func (fl *FastList) RemoveElement(element interface{}) bool {
 
 // Clears the list (removes all elements)
 func (fl *FastList) Clear() {
-
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
 	fl.elementData = fl.elementData[:0]
 	fl.size = 0
 }
 
 // Returns the size of the list
 func (fl *FastList) Size() int {
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
 	return fl.size
 }
 
 func (fl *FastList) Set(index int, element interface{}) interface{} {
+
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
+	}
 
 	for fl.size <= index {
 		fl.elementData = append(fl.elementData, nil)
@@ -88,6 +137,11 @@ func (fl *FastList) Set(index int, element interface{}) interface{} {
 func (fl *FastList) removeIndex(index int) interface{} {
 	if fl.size == 0 {
 		return nil
+	}
+
+	if fl.safe {
+		fl.Lock()
+		defer fl.Unlock()
 	}
 
 	old := fl.elementData[index]

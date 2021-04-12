@@ -4,22 +4,9 @@ import (
 	"testing"
 )
 
-// type testFastList struct {
-// 	elem []interface{}
-// 	size int
-// }
-
-// func init() {
-// 	fl.Add(1)
-// 	fl.Add("a")
-// 	fl.Add("x")
-// 	fl.Add(12456)
-
-// }
-
 func TestGetAll(t *testing.T) {
 
-	fl := NewFastList()
+	fl := NewFastList(true)
 
 	fl.Add(1)
 	fl.Add("a")
@@ -31,19 +18,18 @@ func TestGetAll(t *testing.T) {
 	index := 0
 
 	for _, j := range fl.GetAll() {
-		// t.Errorf("fl: %v - %d", j, i)
-		// t.Errorf("ex: %v - %d", expected[index], index)
 		if j != expected[index] {
 			t.Errorf("Expected %v, but got %v\n", expected[index], j)
 			index++
 		}
 		index++
 	}
+
 }
 
 func TestGet(t *testing.T) {
 
-	fl := NewFastList()
+	fl := NewFastList(true)
 
 	fl.Add(1)
 	fl.Add("a")
@@ -59,11 +45,18 @@ func TestGet(t *testing.T) {
 			t.Errorf("Expected %v, but got %v\n", j, fl.Get(i))
 		}
 	}
+
+	// Index bigger than max index pos
+	_ = fl.Get(len(expected))
+
+	// Negative index
+	_ = fl.Get(-1)
+
 }
 
 func TestRemoveLast(t *testing.T) {
 
-	fl := NewFastList()
+	fl := NewFastList(true)
 
 	fl.Add(1)
 	fl.Add("a")
@@ -79,6 +72,9 @@ func TestRemoveLast(t *testing.T) {
 		}
 	}
 
+	// Test if it's possible to remove a non-existing elem
+	_ = fl.RemoveLast()
+
 	if fl.Size() != 0 {
 		t.Errorf("Expected size 0, but got %d", fl.Size())
 	}
@@ -87,7 +83,7 @@ func TestRemoveLast(t *testing.T) {
 
 func TestSize(t *testing.T) {
 
-	fl := NewFastList()
+	fl := NewFastList(true)
 
 	fl.Add(1)
 	fl.Add("a")
@@ -113,7 +109,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	fl := NewFastList()
+	fl := NewFastList(true)
 
 	fl.Add(1)
 	fl.Add("a")
@@ -129,7 +125,7 @@ func TestClear(t *testing.T) {
 }
 
 func BenchmarkAdd(b *testing.B) {
-	fl := NewFastList()
+	fl := NewFastList(true)
 
 	for i := 0; i < b.N; i++ {
 		fl.Add(i)
@@ -137,7 +133,7 @@ func BenchmarkAdd(b *testing.B) {
 }
 
 func BenchmarkRemoveElement(b *testing.B) {
-	fl := NewFastList()
+	fl := NewFastList(false)
 
 	for i := 0; i < 5000; i++ {
 		fl.Add(i)
@@ -153,7 +149,7 @@ func BenchmarkRemoveElement(b *testing.B) {
 }
 
 func BenchmarkRemoveLast(b *testing.B) {
-	fl := NewFastList()
+	fl := NewFastList(false)
 
 	for i := 0; i < 5000000; i++ {
 		fl.Add(i)
